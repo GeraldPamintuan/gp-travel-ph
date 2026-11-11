@@ -1,0 +1,352 @@
+<header>
+  <a class="brand" href="#" (click)="reset()"
+    ><span class="brand-icon"
+      ><svg
+        class="feet-logo"
+        role="img"
+        aria-label="GalaBuddy feet logo"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 48 48"
+      >
+        <rect width="48" height="48" rx="14" fill="#a7472e" />
+        <g fill="#fff3e2">
+          <g transform="rotate(-24 16 20)">
+            <path d="M12 15c-3 4-4 8-3 12 1 5 7 6 9 2 2-3 0-5 1-8 1-4-3-8-7-6Z" />
+            <ellipse cx="18" cy="10" rx="2.6" ry="3.2" />
+            <ellipse cx="13" cy="9" rx="1.8" ry="2.5" />
+            <ellipse cx="9" cy="11" rx="1.5" ry="2" />
+            <ellipse cx="6" cy="14" rx="1.2" ry="1.7" />
+          </g>
+          <g transform="translate(17 11) rotate(20 16 20)">
+            <path d="M12 15c-3 4-4 8-3 12 1 5 7 6 9 2 2-3 0-5 1-8 1-4-3-8-7-6Z" />
+            <ellipse cx="18" cy="10" rx="2.6" ry="3.2" />
+            <ellipse cx="13" cy="9" rx="1.8" ry="2.5" />
+            <ellipse cx="9" cy="11" rx="1.5" ry="2" />
+            <ellipse cx="6" cy="14" rx="1.2" ry="1.7" />
+          </g>
+        </g></svg
+    ></span>
+    gala<span class="brand-light">buddy</span><i>●</i></a
+  >
+  <nav>
+    <button [class.active]="!savedOnly" (click)="savedOnly = false">Explore Pampanga</button
+    ><button [class.active]="savedOnly" (click)="savedOnly = true">
+      ♡ My saved places <b>{{ saved.size }}</b>
+    </button>
+  </nav>
+  <span class="header-note">Made for the curious. Built for the journey.</span>
+</header>
+<main>
+  <section class="hero">
+    <div class="hero-copy">
+      <div class="eyebrow">YOUR NEXT ADVENTURE IS CLOSER THAN YOU THINK</div>
+      <h1>A little escape.<br />A lot to <em>discover.</em></h1>
+      <p>
+        Good food, coffee stops, picnic afternoons, and morning runs.<br />Find your everyday kind
+        of adventure in Pampanga.
+      </p>
+      <a class="hero-link" href="#explore">Let’s find your next stop <span>↗</span></a>
+      <div class="hero-foot"><span>☀</span> A local guide to the heart of Central Luzon</div>
+    </div>
+    <div class="hero-art">
+      <img
+        [src]="places[0].image || heroFallback"
+        alt="Mount Arayat, Pampanga"
+        (error)="places[0].image = undefined"
+      />
+      <div class="image-shade"></div>
+      <div class="postcard">
+        <small>LESS SCROLLING, MORE EXPLORING</small><strong>Malaus Ko Pu</strong
+        ><span class="welcome-translation">Tuloy po kayo · Welcome to Pampanga</span
+        ><span>📍 Mount Arayat · Pampanga</span>
+      </div>
+      <a
+        *ngIf="places[0].credit"
+        class="photo-caption"
+        [href]="places[0].credit"
+        target="_blank"
+        rel="noopener"
+        >MOUNT ARAYAT · PHOTO SOURCE ↗</a
+      >
+    </div>
+  </section>
+  <section class="explore" id="explore">
+    <div class="section-heading">
+      <div>
+        <div class="eyebrow">TAKE THE SCENIC ROUTE</div>
+        <h2>{{ savedOnly ? 'Your little collection' : 'Where to next?' }}</h2>
+      </div>
+      <p>
+        {{
+          savedOnly
+            ? 'Good places are worth keeping.'
+            : 'Big adventures. Small detours. Your kind of places.'
+        }}
+      </p>
+    </div>
+    <div class="search-row">
+      <label class="search"
+        ><span>⌕</span
+        ><input
+          aria-label="Search destinations"
+          placeholder="Search a place, city, or a little inspiration…"
+          [value]="query"
+          (input)="query = $any($event.target).value"
+        /><button *ngIf="query" (click)="query = ''" aria-label="Clear search">×</button></label
+      ><select
+        aria-label="Filter by town"
+        [value]="town"
+        (change)="town = $any($event.target).value"
+      >
+        <option value="">All of Pampanga</option>
+        <option *ngFor="let t of towns">{{ t }}</option>
+      </select>
+    </div>
+    <div class="filters">
+      <button *ngFor="let c of categories" [class.selected]="category === c" (click)="category = c">
+        {{ icons[c] }} {{ c }}
+      </button>
+    </div>
+    <div class="results-line">
+      <span
+        ><strong>{{ filtered.length }}</strong> places to
+        {{ savedOnly ? 'revisit' : 'spark your curiosity' }}</span
+      ><span>CURATED LOCALLY · EXPLORE MINDFULLY</span>
+    </div>
+    <div class="grid">
+      <article *ngFor="let p of filtered" class="place-card">
+        <button class="card-image" (click)="selected = p" [attr.aria-label]="'Explore ' + p.name">
+          <img
+            *ngIf="p.image"
+            [src]="p.image"
+            [alt]="p.name"
+            loading="lazy"
+            (error)="p.image = undefined"
+          />
+          <div *ngIf="!p.image" class="placeholder">
+            <span>{{ icons[p.category] }}</span><small>{{ p.town }}, Pampanga</small>
+          </div>
+          <span class="badge">{{ p.category }}</span></button
+        ><button
+          class="save"
+          [class.is-saved]="saved.has(p.id)"
+          (click)="toggle(p)"
+          [attr.aria-label]="(saved.has(p.id) ? 'Unsave ' : 'Save ') + p.name"
+        >
+          {{ saved.has(p.id) ? '♥' : '♡' }}
+        </button>
+        <div class="card-content">
+          <small class="location">↗ {{ p.town }}, Pampanga</small>
+          <h3>
+            <button (click)="selected = p">{{ p.name }}</button>
+          </h3>
+          <p>{{ p.description }}</p>
+          <div class="activity-tags" *ngIf="p.activities">
+            <span *ngFor="let a of p.activities">{{ icons[a] }} {{ a }}</span>
+          </div>
+          <div class="card-bottom">
+            <button (click)="selected = p">Take a closer look <span>↗</span></button
+            ><a *ngIf="p.credit" [href]="p.credit" target="_blank" rel="noopener">Photo credit</a>
+          </div>
+        </div>
+      </article>
+    </div>
+    <div class="empty" *ngIf="!filtered.length">
+      <h3>No places here just yet.</h3>
+      <p>
+        {{
+          savedOnly
+            ? 'Tap a heart on a destination to start your collection.'
+            : 'Try another town, category, or search term.'
+        }}
+      </p>
+      <button (click)="reset()">Explore all places</button>
+    </div>
+  </section>
+  <section class="buddy-banner">
+    <span class="mascot"
+      ><svg
+        class="feet-logo buddy-logo"
+        role="img"
+        aria-label="GalaBuddy feet logo"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 48 48"
+      >
+        <rect width="48" height="48" rx="14" fill="#a7472e" />
+        <g fill="#fff3e2">
+          <g transform="rotate(-24 16 20)">
+            <path d="M12 15c-3 4-4 8-3 12 1 5 7 6 9 2 2-3 0-5 1-8 1-4-3-8-7-6Z" />
+            <ellipse cx="18" cy="10" rx="2.6" ry="3.2" />
+            <ellipse cx="13" cy="9" rx="1.8" ry="2.5" />
+            <ellipse cx="9" cy="11" rx="1.5" ry="2" />
+            <ellipse cx="6" cy="14" rx="1.2" ry="1.7" />
+          </g>
+          <g transform="translate(17 11) rotate(20 16 20)">
+            <path d="M12 15c-3 4-4 8-3 12 1 5 7 6 9 2 2-3 0-5 1-8 1-4-3-8-7-6Z" />
+            <ellipse cx="18" cy="10" rx="2.6" ry="3.2" />
+            <ellipse cx="13" cy="9" rx="1.8" ry="2.5" />
+            <ellipse cx="9" cy="11" rx="1.5" ry="2" />
+            <ellipse cx="6" cy="14" rx="1.2" ry="1.7" />
+          </g>
+        </g></svg
+    ></span>
+    <div>
+      <small>A LITTLE LOCAL HELP</small>
+      <h2>Not sure where to start?</h2>
+      <p>Tell Buddy what you’re in the mood for. English or Tagalog, tara!</p>
+    </div>
+    <button (click)="chatOpen = true">Ask GalaBuddy ↗</button>
+  </section>
+  <footer>
+    <span class="brand"
+      ><span class="brand-icon"
+        ><svg
+          class="feet-logo"
+          role="img"
+          aria-label="GalaBuddy feet logo"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 48 48"
+        >
+          <rect width="48" height="48" rx="14" fill="#a7472e" />
+          <g fill="#fff3e2">
+            <g transform="rotate(-24 16 20)">
+              <path d="M12 15c-3 4-4 8-3 12 1 5 7 6 9 2 2-3 0-5 1-8 1-4-3-8-7-6Z" />
+              <ellipse cx="18" cy="10" rx="2.6" ry="3.2" />
+              <ellipse cx="13" cy="9" rx="1.8" ry="2.5" />
+              <ellipse cx="9" cy="11" rx="1.5" ry="2" />
+              <ellipse cx="6" cy="14" rx="1.2" ry="1.7" />
+            </g>
+            <g transform="translate(17 11) rotate(20 16 20)">
+              <path d="M12 15c-3 4-4 8-3 12 1 5 7 6 9 2 2-3 0-5 1-8 1-4-3-8-7-6Z" />
+              <ellipse cx="18" cy="10" rx="2.6" ry="3.2" />
+              <ellipse cx="13" cy="9" rx="1.8" ry="2.5" />
+              <ellipse cx="9" cy="11" rx="1.5" ry="2" />
+              <ellipse cx="6" cy="14" rx="1.2" ry="1.7" />
+            </g>
+          </g></svg></span
+      >galabuddy<i>●</i></span
+    >
+    <p>Go a little further. Leave a little lighter.</p>
+    <small
+      >Curated starter guide · Verify access, fees and hours before travelling.<br />Place
+      references: Wikipedia & linked venue sources · Photos: Wikimedia where available. No paid
+      APIs.</small
+    >
+  </footer>
+</main>
+<button
+  class="chat-launch"
+  (click)="chatOpen = !chatOpen"
+  [attr.aria-expanded]="chatOpen"
+  aria-label="Open GalaBuddy"
+>
+  <svg
+    class="feet-logo buddy-logo"
+    role="img"
+    aria-label="GalaBuddy feet logo"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 48 48"
+  >
+    <rect width="48" height="48" rx="14" fill="#a7472e" />
+    <g fill="#fff3e2">
+      <g transform="rotate(-24 16 20)">
+        <path d="M12 15c-3 4-4 8-3 12 1 5 7 6 9 2 2-3 0-5 1-8 1-4-3-8-7-6Z" />
+        <ellipse cx="18" cy="10" rx="2.6" ry="3.2" />
+        <ellipse cx="13" cy="9" rx="1.8" ry="2.5" />
+        <ellipse cx="9" cy="11" rx="1.5" ry="2" />
+        <ellipse cx="6" cy="14" rx="1.2" ry="1.7" />
+      </g>
+      <g transform="translate(17 11) rotate(20 16 20)">
+        <path d="M12 15c-3 4-4 8-3 12 1 5 7 6 9 2 2-3 0-5 1-8 1-4-3-8-7-6Z" />
+        <ellipse cx="18" cy="10" rx="2.6" ry="3.2" />
+        <ellipse cx="13" cy="9" rx="1.8" ry="2.5" />
+        <ellipse cx="9" cy="11" rx="1.5" ry="2" />
+        <ellipse cx="6" cy="14" rx="1.2" ry="1.7" />
+      </g>
+    </g>
+  </svg>
+  <span>Ask Buddy</span> <b>✧</b>
+</button>
+<aside class="chat" *ngIf="chatOpen" aria-label="GalaBuddy travel assistant">
+  <div class="chat-header">
+    <span
+      ><svg
+        class="feet-logo buddy-logo"
+        role="img"
+        aria-label="GalaBuddy feet logo"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 48 48"
+      >
+        <rect width="48" height="48" rx="14" fill="#a7472e" />
+        <g fill="#fff3e2">
+          <g transform="rotate(-24 16 20)">
+            <path d="M12 15c-3 4-4 8-3 12 1 5 7 6 9 2 2-3 0-5 1-8 1-4-3-8-7-6Z" />
+            <ellipse cx="18" cy="10" rx="2.6" ry="3.2" />
+            <ellipse cx="13" cy="9" rx="1.8" ry="2.5" />
+            <ellipse cx="9" cy="11" rx="1.5" ry="2" />
+            <ellipse cx="6" cy="14" rx="1.2" ry="1.7" />
+          </g>
+          <g transform="translate(17 11) rotate(20 16 20)">
+            <path d="M12 15c-3 4-4 8-3 12 1 5 7 6 9 2 2-3 0-5 1-8 1-4-3-8-7-6Z" />
+            <ellipse cx="18" cy="10" rx="2.6" ry="3.2" />
+            <ellipse cx="13" cy="9" rx="1.8" ry="2.5" />
+            <ellipse cx="9" cy="11" rx="1.5" ry="2" />
+            <ellipse cx="6" cy="14" rx="1.2" ry="1.7" />
+          </g>
+        </g></svg
+    ></span>
+    <div><strong>GalaBuddy</strong><small>Your Pampanga travel companion</small></div>
+    <button (click)="chatOpen = false" aria-label="Close chat">×</button>
+  </div>
+  <div class="chat-body" aria-live="polite">
+    <div *ngFor="let m of messages" class="message" [class.user]="m.user">{{ m.text }}</div>
+    <button class="chat-result" *ngFor="let p of chatResults" (click)="selected = p">
+      {{ icons[p.category] }} {{ p.name }} <small>{{ p.town }} ↗</small>
+    </button>
+  </div>
+  <div class="suggestions">
+    <button *ngFor="let q of suggestions" (click)="ask(q)">{{ q }}</button>
+  </div>
+  <form (submit)="$event.preventDefault(); ask(chatInput); chatInput = ''">
+    <input
+      aria-label="Message Buddy"
+      placeholder="Saan tayo pupunta?"
+      [value]="chatInput"
+      (input)="chatInput = $any($event.target).value"
+    /><button type="submit" aria-label="Send message">↑</button>
+  </form>
+  <small class="chat-disclaimer">Search-based buddy · No live fees or opening hours</small>
+</aside>
+<div class="modal-backdrop" *ngIf="selected" (click)="selected = null">
+  <section
+    class="modal"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-label]="selected.name"
+    (click)="$event.stopPropagation()"
+  >
+    <button class="modal-close" (click)="selected = null" aria-label="Close destination">×</button
+    ><img *ngIf="selected.image" [src]="selected.image" [alt]="selected.name" />
+    <div class="modal-content">
+      <span class="eyebrow">{{ selected.category }} · {{ selected.town }}, Pampanga</span>
+      <h2>{{ selected.name }}</h2>
+      <p>{{ selected.description }}</p>
+      <div class="tip">
+        <strong>Before you go</strong>
+        <p>{{ selected.tip }}</p>
+        <small>Fees and opening hours: unverified. Confirm directly before travelling.</small>
+      </div>
+      <div class="modal-actions">
+        <a class="primary" [href]="mapUrl(selected)" target="_blank" rel="noopener"
+          >Get directions ↗</a
+        ><button (click)="toggle(selected)">
+          {{ saved.has(selected.id) ? '♥ Saved' : '♡ Save place' }}
+        </button>
+      </div>
+      <a [href]="wikiUrl(selected)" target="_blank" rel="noopener">Read destination reference ↗</a
+      ><a *ngIf="selected.credit" [href]="selected.credit" target="_blank" rel="noopener">
+        · Photo source & license ↗</a
+      >
+    </div>
+  </section>
+</div>
